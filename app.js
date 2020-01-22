@@ -1,18 +1,19 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var expressHbs = require('express-handlebars');
-var mongoose = require('mongoose');
-var session = require('express-session');
-var passport = require('passport');
-var flash = require('connect-flash');
-var validator = require('express-validator');
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let expressHbs = require('express-handlebars');
+let mongoose = require('mongoose');
+let session = require('express-session');
+let passport = require('passport');
+let flash = require('connect-flash');
+let validator = require('express-validator');
 
-var indexRouter = require('./routes/index');
+let indexRouter = require('./routes/index');
+let userRouter = require('./routes/user');
 
-var app = express();
+let app = express();
 
 mongoose.connect('mongodb://localhost:27017/shopping');
 require('./config/passport');
@@ -32,6 +33,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (req, res, next) {
+  res.locals.login = req.isAuthenticated();
+  next();
+});
+
+app.use('/user', userRouter);
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
