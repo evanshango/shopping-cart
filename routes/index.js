@@ -1,18 +1,18 @@
-var express = require('express');
-var router = express.Router();
-var csrf = require('csurf');
-var passport = require('passport');
-var Product = require('../models/product');
+let express = require('express');
+let router = express.Router();
+let csrf = require('csurf');
+let passport = require('passport');
+let Product = require('../models/product');
 
-var csrfProtection = csrf();
+let csrfProtection = csrf();
 router.use(csrfProtection);
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
     Product.find(function (err, docs) {
-        var productChunks = [];
-        var chuckSize = 3;
-        for (var i = 0; i < docs.length; i += chuckSize) {
+        let productChunks = [];
+        let chuckSize = 3;
+        for (let i = 0; i < docs.length; i += chuckSize) {
             productChunks.push(docs.slice(i, i + chuckSize))
         }
         res.render('shop/index', {title: 'Shopping Cart', products: productChunks});
@@ -20,13 +20,13 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/user/signup', function (req, res, next) {
-    var messages = req.flash('error');
-    res.render('user/signup', {csrfToken: req.csrfToken(), messages, hasErrors: messages.length > 0});
+    let messages = req.flash('error');
+    res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
 });
 
 router.post('/user/signup', passport.authenticate('local.signup', {
-    successRedirect: '/user/profile',
-    failureRedirect: '/user/signup',
+    successRedirect: '/profile',
+    failureRedirect: '/signup',
     failureFlash: true
 }));
 
@@ -34,4 +34,16 @@ router.get('/profile', function (req, res, next) {
     res.render('user/profile')
 });
 
+router.get('/user/signin', function (req, res, next) {
+    let messages = req.flash('error');
+    res.render('user/signin', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
+});
+
+router.post('/user/signin', passport.authenticate('local.signin', {
+    successRedirect: '/profile',
+    failureRedirect: '/signin',
+    failureFlash: true
+}));
+
 module.exports = router;
+
